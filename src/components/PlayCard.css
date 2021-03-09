@@ -1,0 +1,28 @@
+.PlayCard {
+    height: 14%;
+    width: 80%;
+    background-color: white;
+    margin:5px;  /* and that, will result in a 10px gap */
+
+    border-radius: 30px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+}
+
+
+.playcard-imageholder {
+    width: 50%;
+    height: 100%;
+}
+
+.information {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.information>div {
+    font-size: 1.5vw;
+}
