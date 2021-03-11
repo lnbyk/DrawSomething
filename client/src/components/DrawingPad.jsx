@@ -256,4 +256,4 @@ const styles = {
 
 export default DrawingPad;
 
-console.log(localStorage.getItem("1111"));
+// console.log(localStorage.getItem("1111"));
