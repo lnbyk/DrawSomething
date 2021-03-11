@@ -63,15 +63,34 @@
 
 <body>
     <ul id="messages"></ul>
-    <form id="form" action="">
-        <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+    <div id="form" action="">
+        <input id="input" autocomplete="off" /><button onclick="createRoom()">Send</button>
+
+    </div>
+    <button onclick="startGame()">start</button>
+    <button onclick='createRoom("cccc")'>dfferent</button>
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const io = require("socket.io-client");
-        const ioClient = io.connect("http://localhost:8000");
+        var socket = io();
 
-        
+
+        // Message from server
+        socket.on('message', (message) => {
+            console.log("wecloment : " + message);
+        });
+
+
+        // join room feedback
+        socket.on('room_feedback', data => {
+            console.log(data)
+        })
+        function createRoom(roomId = "myRoom") {
+            socket.emit("createRoom", roomId)
+        }
+
+        function startGame() {
+            socket.emit('startGame', socket.id)
+        }
     </script>
 </body>
 

@@ -9,6 +9,7 @@ import { createStore, combineReducers } from "redux";
 import { Provider } from "react-redux";
 
 import playerReducer from "./store/reducers/player";
+import "./App.css"
 
 // If you are using v7 or any earlier version of the JS SDK, you should import firebase using namespace import
 // import * as firebase from "firebase/app"
@@ -28,13 +29,15 @@ const store = createStore(rootReducer);
 const App = () => {
   return (
     <Provider store={store}>
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/" component={HomeScreen} />
-          <Route exact path="/lobby" component={GameLobbyScreen} />
-          <Route exact path="/test" component={RoomCreateModal} />
-        </Switch>
-      </BrowserRouter>
+      <div className="mainContainer">
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/" component={HomeScreen} />
+            <Route exact path="/lobby" component={GameLobbyScreen} />
+            <Route exact path="/test" component={RoomCreateModal} />
+          </Switch>
+        </BrowserRouter>
+      </div>
     </Provider>
   );
 };
