@@ -5,6 +5,8 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 // Firebase App (the core Firebase SDK) is always required and must be listed first
 
+
+
 ReactDOM.render(
   <React.StrictMode>
     <App />
