@@ -1,15 +1,17 @@
 import "./App.css";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
-
+import Socket from "./utils/socket";
 import HomeScreen from "./screens/HomeScreen";
 import GameLobbyScreen from "./screens/GameLobbyScreen";
 import RoomCreateModal from "./components/RoomCreateModal";
-
-import { createStore, combineReducers } from "redux";
+import thunk from 'redux-thunk'
+import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
+import roomReducer from './store/reducers/room'
 
-import playerReducer from "./store/reducers/player";
-import "./App.css"
+// import socket io
+
+import "./App.css";
 
 // If you are using v7 or any earlier version of the JS SDK, you should import firebase using namespace import
 // import * as firebase from "firebase/app"
@@ -20,11 +22,17 @@ import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 
+
+
+var mysocket = new Socket()
+var a = new Socket();
+mysocket.onConnect(111)
+
 const rootReducer = combineReducers({
-  player: playerReducer,
+  room: roomReducer,
 });
 
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const App = () => {
   return (

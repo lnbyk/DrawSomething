@@ -122,6 +122,7 @@ const DrawingPad = (props) => {
   const _onSketchChange = (e) => {
     let prev = canUndo;
     let now = _sketch.canUndo();
+    props.onDraw(JSON.stringify(_sketch.toJSON()));
     if (prev !== now) {
       setCanUndo(now);
     }

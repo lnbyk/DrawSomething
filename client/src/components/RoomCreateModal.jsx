@@ -3,7 +3,8 @@ import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import Room from "../models/Room";
-import "./RoomCreateModal.css"
+import Socket from '../utils/socket'
+import "./RoomCreateModal.css";
 
 const timeRange = [60, 70, 80, 90, 100];
 const personLimits = [2, 3, 4, 5];
@@ -15,6 +16,7 @@ const RoomCreateModal = forwardRef((props, ref) => {
   const [personLimit, setPersonLimit] = useState(personLimits[0]);
   const [isShow, setIsShow] = useState(false);
   const [promiseInfo, setPromiseInfo] = useState(null);
+  const socket = new Socket().socket
 
   const roomNameHandler = (e) => {
     setRoomName(e.target.value);
@@ -34,14 +36,14 @@ const RoomCreateModal = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     show: async () => {
       return new Promise((resolve, reject) => {
-        setPromiseInfo({ resolve, reject });
         setIsShow(true);
+        setPromiseInfo({ resolve, reject });
       });
     },
   }));
 
   const createHandler = () => {
-    let room = new Room("1311212", timeLimit, roomName, personLimit);
+    let room = new Room(socket.id, timeLimit, roomName, personLimit);
     setIsShow(false);
     promiseInfo.resolve(room);
   };
@@ -54,7 +56,7 @@ const RoomCreateModal = forwardRef((props, ref) => {
   return (
     <div
       className="roomcreatemodal-container"
-      style={{ display: isShow ? "" : "none" }}
+      style={{ display: isShow ? "flex" : "none", zIndex: 20 }}
       ref={ref}
     >
       <div className="room-input">
