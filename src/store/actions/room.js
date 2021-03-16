@@ -1,4 +1,5 @@
 export const GET_ALL_ROOM = "GET_ALL_ROOM";
+export const JOIN_ROOM = "JOIN_ROOM";
 export const GAME_STATE = {
   PREPARE: "PREPARE",
   INGAME: "INGAME",
@@ -16,6 +17,13 @@ export const getAllRoom = (rooms) => {
     rooms: rooms,
   };
 };
+
+export const jointRoom = (room) => {
+  return {
+    type: JOIN_ROOM,
+    room:room
+  }
+}
 
 /***************************************************************************************** */
 /* Async Action items using - Sockets													   */
@@ -41,5 +49,24 @@ export const startGame = (socket, roomid) => {
 export const onDraw = (socket, roomid, drawings) => {
   return (dispatch) => {
     socket.onDraw(roomid, drawings);
+  }
+}
+
+
+export const sendMessage = (socket, roomid, message) => {
+  return (dispatch) => {
+    socket.socket.emit("sendMessage", roomid, message)
+  }
+}
+
+export const leaveRoom = (socket) => {
+  return (dispatch) => {
+    socket.socket.emit("leaveRoom");
+  }
+}
+
+export const prepare = (socket, roomid) => {
+  return (dispatch) => {
+    socket.socket.emit("prepare", roomid);
   }
 }
