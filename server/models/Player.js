@@ -5,6 +5,7 @@ class Player {
     this.name = name;
     this.isEditing = false;
     this.prepare = false;
+    this.guessed = new Set();
   }
 }
 
