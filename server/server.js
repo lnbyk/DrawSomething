@@ -16,10 +16,11 @@ app.get("/", (req, res) => {
 
 var rooms = new Map();
 var players = new Map();
+var messages = new Map();
 
 io.on("connection", (socket) => {
   // add a newplayer to player lists
-  let newPlayer = new Player(socket.id, "test : " + socket.id);
+  let newPlayer = new Player(socket.id, "test : " + socket.id.substring(0, 2));
   players.set(socket.id, newPlayer);
   console.log("a user connected .. total players in room : " + players.size);
 
@@ -36,7 +37,7 @@ io.on("connection", (socket) => {
     if (rooms.has(id)) {
       var a = rooms.get(id);
 
-      console.log("join same one")
+      console.log("join same one");
       // try if we can successfully add the player
       try {
         var result = await a.addPlayer(players.get(socket.id));
@@ -47,12 +48,17 @@ io.on("connection", (socket) => {
       }
     } else {
       var fff = new Room(id, timeLimit, name, maxPlayer, socket.id);
-      fff.addPlayer(players.get(socket.id));
+      var player = players.get(socket.id);
+      player.isEditing = true;
+      fff.addPlayer(player);
       socket.emit("message", "Welcome to ChatCord !");
       rooms.set(id, fff);
+      messages.set(id, []);
       socket.join(id);
     }
 
+    socket.emit("jointRoom", JSON.stringify(rooms.get(id)));
+    socket.to(id).emit("jointRoom", JSON.stringify(rooms.get(id)));
     socket.emit("allRooms", JSON.stringify([...rooms.values()]));
     socket.broadcast.emit("allRooms", JSON.stringify([...rooms.values()]));
   });
@@ -69,7 +75,7 @@ io.on("connection", (socket) => {
         v.players.some((v) => v && v.id === socket.id)
       );
 
-      console.log(socket.id)
+      // console.log(socket.id);
       let result = await curInRoom.canStart();
       socket.emit("room_feedback", result);
       curInRoom.start();
@@ -79,7 +85,7 @@ io.on("connection", (socket) => {
           clearInterval(roomTimer);
         } else {
           socket.emit("roomPlaying", JSON.stringify(curInRoom));
-          console.log(roomid)
+          console.log(roomid);
           socket.to(roomid).emit("roomPlaying", JSON.stringify(curInRoom));
           // switch (curInRoom.round_state) {
           //   case Room.ROUND_STATE.PREPARE:
@@ -105,30 +111,85 @@ io.on("connection", (socket) => {
     }
   });
 
-
-
   socket.on("onDraw", (roomid, drawings) => {
-    socket.to(roomid).emit('onDraw', JSON.stringify(JSON.parse(drawings)))
-  })
+    socket.to(roomid).emit("onDraw", JSON.stringify(JSON.parse(drawings)));
+  });
+
+  socket.on("prepare", (roomid) => {
+    players.get(socket.id).prepare = !players.get(socket.id).prepare;
+    socket.emit("jointRoom", JSON.stringify(rooms.get(roomid)));
+    socket.to(roomid).emit("jointRoom", JSON.stringify(rooms.get(roomid)));
+  });
+
+  socket.on("sendMessage", (roomid, message) => {
+    const currentRoom = rooms.get(roomid);
+    const currentPlayer = players.get(socket.id);
+    // if guess correct
+    if (message === currentRoom.currentQuestion.question) {
+      message = message.replace(/./g, "*");
+      // we need to update the scores for current user
+
+      if (!currentPlayer.guessed.has(currentRoom.curRound)) {
+        currentPlayer.guessed.add(currentRoom.curRound);
+        currentPlayer.points += 2;
+        currentRoom.curCorrect += 1;
+        socket.emit("allRooms", JSON.stringify([...rooms.values()]));
+        socket.broadcast.emit("allRooms", JSON.stringify([...rooms.values()]));
+      }
+    }
+    console.log(currentRoom.curRound);
+    messages.get(roomid).push({
+      sender: players.get(socket.id).name,
+      message: message,
+      id: socket.id,
+    });
+    socket
+      .to(roomid)
+      .emit("loadMessages", JSON.stringify(messages.get(roomid)));
+    socket.emit("loadMessages", JSON.stringify(messages.get(roomid)));
+    //io.emit("loadMessages", 1);
+  });
+
+  socket.on("leaveRoom", () => {
+    leaveRoom();
+  });
 
   socket.on("disconnect", () => {
     players.delete(socket.id);
     console.log(
       socket.id + " leaves ...  total players in room :" + players.size
     );
-    let curInRoom = [...rooms.values()].find((v) =>
-      v.players.some((v) => v === socket.id)
-    );
+
+    leaveRoom();
+  });
+
+  function leaveRoom() {
     try {
+      console.log(111)
+      console.log([...rooms.values()])
+      let curInRoom = [...rooms.values()].find((v) => 
+        v.players.some((v) => v && v.id === socket.id)
+      );
+
+    
+      console.log(curInRoom);
       curInRoom.leave(socket.id, () => {
+        socket.emit("jointRoom", JSON.stringify(curInRoom));
+        socket.to(curInRoom.id).emit("jointRoom", JSON.stringify(curInRoom));
         if (curInRoom.isEmpty()) {
-          rooms.splice(rooms.indexOf(curInRoom), 1);
+          rooms.delete(curInRoom.id);
         }
       });
+
+
+
+      socket.emit("allRooms", JSON.stringify([...rooms.values()]));
+      socket.broadcast.emit("allRooms", JSON.stringify([...rooms.values()]));
     } catch (err) {
+      console.log(err)
       socket.emit("message", err.error);
     }
-  });
+  }
 });
 
 http.listen(8000, () => {

@@ -10,6 +10,25 @@ class Room {
     DRAWING: "DRAWING",
   };
 
+  static QUESTION_SETS = [
+    {
+      question: "布娃娃",
+      hint: "三个字，儿童玩具",
+    },
+    {
+      question: "激光",
+      hint: "两个字，光学武器",
+    },
+    {
+      question: "餐巾纸",
+      hint: "三个字，餐具",
+    },
+    {
+      question: "耳机",
+      hint: "两个字，电子产品",
+    },
+  ];
+
   constructor(id, timeLimit, name, maxPlayer, owner) {
     this.id = id;
     this.name = name;
@@ -26,6 +45,8 @@ class Room {
     this.prepare = 20;
     this.state = Room.GAME_STATE.PREPARE;
     this.round_state = Room.GAME_STATE.PREPARE;
+    this.currentQuestion = Room.QUESTION_SETS[0];
+    this.curCorrect = 0;
   }
 
   addPlayer = async (p) => {
@@ -50,9 +71,11 @@ class Room {
   };
 
   leave = (p, callback) => {
-    this.players[this.players.indexOf(p)] = null;
+    console.log(1)
+    //this.players.find(v => v.id === p) = null
+    this.players[this.players.findIndex(v => v.id === p)] = null
     this.curPlayers--;
-
+    console.log(this.players)
     callback();
   };
 
@@ -83,6 +106,19 @@ class Room {
       this.roundTimer = this.timeLimit;
       const interval = setInterval(() => {
         this.roundTimer--;
+
+        if (this.curCorrect === this.curPlayers) {
+          this.currentQuestion =
+            Room.QUESTION_SETS[
+              Math.floor(Math.random() * Room.QUESTION_SETS.length)
+            ];
+
+            clearInterval(interval);
+            resolve();
+        }
+
+        console.log(this.roundTimer);
+
         if (this.roundTimer === 0) {
           clearInterval(interval);
           resolve();
@@ -126,7 +162,7 @@ class Room {
 
       this.nextPlayer();
     }
-   this.state = Room.GAME_STATE.FINISH;
+    this.state = Room.GAME_STATE.FINISH;
   };
 
   starts = () => {
@@ -139,14 +175,14 @@ class Room {
       (this.players.findIndex((v) => v.id === this.currentEditing) + 1) %
       this.players.length;
 
-    while (curIndex %= this.players.length < this.players.length) {
+    while ((curIndex %= this.players.length < this.players.length)) {
       var nextReadyPlayer = this.players[curIndex];
       if (nextReadyPlayer !== null) {
-        console.log(nextReadyPlayer)
+        console.log(nextReadyPlayer);
         this.currentEditing = nextReadyPlayer.id;
         return;
       }
-      curIndex++
+      curIndex++;
     }
   };
 }
