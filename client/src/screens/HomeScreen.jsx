@@ -1,71 +1,120 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Button from "@material-ui/core/Button";
 import PlayerCard from "../components/PlayCard";
 import DrawingPad from "../components/DrawingPad";
+import ChatContainer from "../components/ChatContainer";
 import Socket from "../utils/socket";
-import { startGame, createNewRoomSocket, GAME_STATE, ROUND_STATE, onDraw} from "../store/actions/room";
-import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Backdrop from "@material-ui/core/Backdrop";
+import {
+  startGame,
+  GAME_STATE,
+  ROUND_STATE,
+  onDraw,
+  leaveRoom,
+  prepare,
+} from "../store/actions/room";
+import { useDispatch, useSelector } from "react-redux";
+import CheckIcon from "@material-ui/icons/Check";
 import "../App.css";
 
-
-
 const HomeScreen = (props) => {
-  const [players, setPlayers] = useState([]);
+  // const [players, setPlayers] = useState([]);
   const [initialValue, setInitialValue] = useState(
     localStorage.getItem("1111") || null
   );
-  const [isOwner, setIsOwner] = useState(true);
   const [gameState, setGameState] = useState("waiting");
-  const [timeLeft, setTimeLeft] = useState("")
+  const [timeLeft, setTimeLeft] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [backDrop, setBackDrop] = useState(false);
 
   const socket = Socket.getInstance();
   const dispatch = useDispatch();
 
+  const drawingPadRef = useRef();
+  const selectedRoom = useSelector((state) => {
+    console.log(state.room.currentIn);
+    return state.room.currentIn;
+    // return state.room.room.find((v) => v.id === props.location.state.roomid);
+  });
 
+  const history = useHistory();
   // update board
-  socket.socket.on("onDraw", data => {
-    setInitialValue(data);
-  })
+
+  useEffect(() => {
+    socket.socket.on("onDraw", (data) => {
+      setInitialValue(data);
+    });
+  });
 
   // check for room status
-  socket.socket.on("roomPlaying", (data) => {
-    data = JSON.parse(data);
-    console.log(data)
-    if (data.state === GAME_STATE.PREPARE) {
-      setGameState("waiting");
-    } else if (data.state === GAME_STATE.INGAME) {
-      switch (data.round_state) {
-        case ROUND_STATE.PREPARE:
-          setGameState("preparing:");
-          setTimeLeft(data.prepare);
-          break;
-        case ROUND_STATE.DRAWING:
-          setGameState("drawing:");
-          setTimeLeft(data.roundTimer);
-          break;
-        default:
-          break
-      }
-    }
-  });
   useEffect(() => {
-    setPlayers((state) =>
-      ["name", "1", "2", "3", "4", ...state].filter((_, index) => index < 5)
-    );
+    socket.socket.on("roomPlaying", (data) => {
+      data = JSON.parse(data);
+      if (data.state === GAME_STATE.PREPARE) {
+        setGameState("waiting");
+      } else if (data.state === GAME_STATE.INGAME) {
+        switch (data.round_state) {
+          case ROUND_STATE.PREPARE:
+            setGameState("preparing:");
+            setTimeLeft(data.prepare);
+            setIsEditing(
+              data.players.find((v) => v !== null && v.id === data.owner)
+                .isEditing && socket.socket.id === data.owner
+            );
+            drawingPadRef.current._clear();
+            break;
+          case ROUND_STATE.DRAWING:
+            setGameState("drawing:");
+            setTimeLeft(data.roundTimer);
+            setIsEditing(
+              data.players.find((v) => v !== null && v.id === data.owner)
+                .isEditing && socket.socket.id === data.owner
+            );
+            break;
+          default:
+            break;
+        }
+      } else if ((data.state = GAME_STATE.FINISH)) {
+        setGameState("waiting");
+        setTimeLeft("");
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onStart = () => {
     dispatch(startGame(socket, props.location.state.roomid));
   };
 
+  const onPrepare = () => {
+    dispatch(prepare(socket, props.location.state.roomid));
+  };
+  const onExit = async () => {
+    setBackDrop(true);
+    dispatch(leaveRoom(socket));
+    await new Promise((resolve) => {
+      setTimeout(() => {
+        history.goBack();
+        resolve(setBackDrop(false));
+      }, 800);
+    });
+  };
+
   const _onDraw = (drawings) => {
     dispatch(onDraw(socket, props.location.state.roomid, drawings));
-  }
-
-  const testRoom = () => {
-    dispatch(createNewRoomSocket(socket));
   };
   const PrepareContainer = () => {
+    let currentUser = null;
+    let isOwner = null;
+    if (selectedRoom) {
+      currentUser = selectedRoom.players.find(
+        (v) => v && v.id === socket.socket.id
+      );
+      isOwner = selectedRoom.owner === socket.socket.id;
+    }
+
     return (
       <div className="prepareContainer">
         {" "}
@@ -73,25 +122,56 @@ const HomeScreen = (props) => {
           variant="contained"
           style={{
             backgroundColor: "#00FF00",
-            width: "40%",
+            width: "46%",
             height: "70%",
             borderRadius: "30px",
             borderWidth: "2px 2px",
           }}
-          onClick={onStart}
+          onClick={isOwner ? onStart : onPrepare}
         >
-          {isOwner ? "Start" : "Prepare"}
+          {isOwner ? (
+            "Start"
+          ) : currentUser && currentUser.prepare ? (
+            <div>
+              <CheckIcon style={{ fontSize: 60, color: "orange" }} />
+              <div
+                style={{
+                  opacity: 0.6,
+                  position: "absolute",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  top: "50%",
+                }}
+              >
+                ready
+              </div>
+            </div>
+          ) : (
+            <div style={{ position: "relative" }}>
+              <div
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  top: "50%",
+                }}
+              >
+                prepare
+              </div>
+            </div>
+          )}
         </Button>
         <Button
           variant="contained"
           style={{
             backgroundColor: "red",
-            width: "40%",
+            width: "46%",
             height: "70%",
             borderRadius: "30px",
             border: "solid gray",
             borderWidth: "2px 2px",
           }}
+          onClick={onExit}
         >
           Exit
         </Button>
@@ -101,21 +181,43 @@ const HomeScreen = (props) => {
 
   return (
     <div className="container">
+      <Backdrop style={{ zIndex: 10 }} open={backDrop}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <div className="player-container">
         <PrepareContainer />
-        {players.map((val) => {
-          return <PlayerCard name={val} />;
-        })}
+        {selectedRoom &&
+          selectedRoom.players.map((val) => {
+            if (val === null) return <PlayerCard name={"EMPTY"} />;
+            else
+              return (
+                <PlayerCard
+                  name={val.name}
+                  isEditing={val.isEditing}
+                  score={"score: " + val.points}
+                />
+              );
+          })}
       </div>
 
       <div className="game-container">
-        <DrawingPad initialValue={initialValue} onDraw={ _onDraw}/>
+        <DrawingPad
+          ref={drawingPadRef}
+          initialValue={initialValue}
+          onDraw={_onDraw}
+          isEditing={isEditing}
+          roomid={props.location.state.roomid}
+        />
       </div>
       <div className="chat-container">
         <div className="globalTimer">
           <text>{gameState}</text>
           <text style={{ color: "yellowgreen" }}>{timeLeft}</text>
         </div>
+        <ChatContainer
+          isEditing={isEditing}
+          roomid={props.location.state.roomid}
+        />
       </div>
     </div>
   );

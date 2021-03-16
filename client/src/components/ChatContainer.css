@@ -1,0 +1,49 @@
+.chatarea {
+  height: 90%;
+  width: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 2%;
+  padding-top: 2%;
+}
+
+.messagesDisplayArea {
+  width: 90%;
+  height: 90%;
+  margin-left: 5%;
+  border: black solid 0.1px;
+  display: flex;
+  word-wrap: break-word;
+  flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.chatInputArea {
+  margin-left: 5%;
+  margin-top: 5%;
+  border-radius: 40px;
+  border: black solid 1px;
+  background-color: white;
+  width: 90%;
+  height: 5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column-reverse;
+}
+
+.inputOverLay {
+  position: absolute;
+  width: 90%;
+  height: 5%;
+  margin-left: 5%;
+  bottom: 3%;
+  z-index: 2;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}

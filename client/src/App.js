@@ -1,13 +1,13 @@
 import "./App.css";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import Socket from "./utils/socket";
 import HomeScreen from "./screens/HomeScreen";
 import GameLobbyScreen from "./screens/GameLobbyScreen";
 import RoomCreateModal from "./components/RoomCreateModal";
-import thunk from 'redux-thunk'
+import thunk from "redux-thunk";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
-import roomReducer from './store/reducers/room'
+import roomReducer from "./store/reducers/room";
 
 // import socket io
 
@@ -22,11 +22,8 @@ import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 
-
-
-var mysocket = new Socket()
-var a = new Socket();
-mysocket.onConnect(111)
+var mysocket = new Socket();
+mysocket.onConnect(111);
 
 const rootReducer = combineReducers({
   room: roomReducer,
@@ -40,9 +37,17 @@ const App = () => {
       <div className="mainContainer">
         <BrowserRouter>
           <Switch>
-            <Route exact path="/" component={HomeScreen} />
+            <Route exact path="/">
+              <Redirect to="/lobby" />
+            </Route>
             <Route exact path="/lobby" component={GameLobbyScreen} />
             <Route exact path="/test" component={RoomCreateModal} />
+            <Route
+              path={`/gameroom/:id`}
+              render={(props) => {
+                return <HomeScreen {...props} />;
+              }}
+            />
           </Switch>
         </BrowserRouter>
       </div>
