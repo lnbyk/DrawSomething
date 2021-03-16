@@ -1,27 +1,28 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import RoomCreateModal from "../components/RoomCreateModal";
 import Table from "../components/Table";
-import RefreshIcon from "@material-ui/icons/Refresh";
 import Room from "../models/Room";
 import Socket from "../utils/socket";
 import {
   getAllRoom,
   createNewRoomSocket,
   getAllRoomsSocket,
+  jointRoom,
 } from "../store/actions/room";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import { useHistory } from "react-router";
-
-const { promisify } = require("util");
+import Backdrop from "@material-ui/core/Backdrop";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const curRoom = new Room("21313", 60, "aad", 2);
 const GameLobbyScreen = (props) => {
   const modalRef = useRef();
-  const [totalRooms, setTotalRooms] = useState(2);
   const [timeLeft, setTimeLeft] = useState(curRoom.prepare);
   const [gameState, setGameState] = useState(Room.GAME_STATE.prepare);
-  const [socket, setSocket] = useState(Socket.getInstance());
+  const [backDrop, setBackDrop] = useState(false);
+
+  const socket = Socket.getInstance();
   const allRooms = useSelector((state) => {
     return state.room.room;
   });
@@ -29,12 +30,32 @@ const GameLobbyScreen = (props) => {
   const dispatch = useDispatch();
   const history = useHistory();
 
-  socket.socket.on("allRooms", (rooms) => {
-    rooms = JSON.parse(rooms);
-    dispatch(getAllRoom(rooms));
-  });
+  useEffect(() => {
+    socket.socket.on("allRooms", (rooms) => {
+      rooms = JSON.parse(rooms);
+      dispatch(getAllRoom(rooms));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const createRoom = () => {
+  useEffect(() => {
+    socket.socket.on("jointRoom", (room) => {
+      room = JSON.parse(room);
+      dispatch(jointRoom(room));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const waitJoinRoom = async (createdRoom) => {
+    setBackDrop(true);
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        dispatch(createNewRoomSocket(socket, createdRoom));
+        resolve(setBackDrop(false));
+      }, 800);
+    });
+  };
+  const createRoom = async () => {
     const modal = modalRef.current;
     setTimeout(async () => {
       try {
@@ -45,8 +66,11 @@ const GameLobbyScreen = (props) => {
           timeLimit: result.timeLimit,
           maxPlayer: result.maxPlayer,
         };
-        dispatch(createNewRoomSocket(socket, createdRoom));
-        history.push("/", { roomid: createdRoom.id });
+
+        await waitJoinRoom(createdRoom);
+        history.push(`/gameroom/${createdRoom.id}`, {
+          roomid: createdRoom.id,
+        });
       } catch (err) {
         console.log(err);
         alert("cancel");
@@ -54,16 +78,14 @@ const GameLobbyScreen = (props) => {
     }, 100);
   };
 
-  const joinRoom = (id) => {
-    console.log(id);
-    let createdRoom = {
-      id: id,
-      name: 1,
-      timeLimit: 1,
-      maxPlayer: 1,
-    };
-    dispatch(createNewRoomSocket(socket, createdRoom));
-    history.push("/", { roomid: createdRoom.id });
+  const joinRoom = async (id) => {
+    let createdRoom = allRooms.find((v) => v.id === id);
+    if (createdRoom.curPlayers < createdRoom.maxPlayer) {
+      await waitJoinRoom(createdRoom);
+      history.push(`gameroom/${id}`, { roomid: createdRoom.id });
+    } else {
+      alert("room is full");
+    }
   };
 
   const renderRoom = () => {
@@ -76,6 +98,7 @@ const GameLobbyScreen = (props) => {
             height={200}
             width={200}
             joinHandler={() => joinRoom(rrrrr.id)}
+            gameState={rrrrr.state}
           ></Table>
         );
       }
@@ -84,17 +107,20 @@ const GameLobbyScreen = (props) => {
   var rooms = [];
   renderRoom();
   useEffect(() => {
-    setTotalRooms((e) => e++);
     renderRoom();
   }, [allRooms]);
 
   // initialize all rooms
   useEffect(() => {
     dispatch(getAllRoomsSocket(socket));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div className="container" id="lobby">
+      <Backdrop style={{ zIndex: 20 }} open={backDrop}>
+        <CircularProgress color="inherit" />
+      </Backdrop>
       <button onClick={createRoom}>open </button>
       <RoomCreateModal ref={modalRef} />
       <div className="tables-container">{rooms}</div>

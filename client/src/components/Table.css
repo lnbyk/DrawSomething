@@ -1,7 +1,48 @@
 .round-table {
-     
-        background: lightblue;
-        border-radius: 50%;
-        margin-top: 2%;
-        margin-bottom: 2%;
+  background: lightblue;
+  border-radius: 50%;
+  margin-top: 2%;
+  margin-bottom: 2%;
+  position: relative;
+}
+
+.round-table-top {
+  width: 52%;
+  height: 25%;
+  padding: 2%;
+  left: 50%;
+  top: 12%;
+  /* bring your own prefixes */
+  transform: translate(-50%, 0);
+  position: absolute;
+  display: flex;
+
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.round-table-bottom {
+  width: 80%;
+  height: 25%;
+  padding: 2%;
+  left: 50%;
+  top: 42%;
+  /* bring your own prefixes */
+  transform: translate(-50%, 0);
+  display: flex;
+  position: absolute;
+
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.child-table {
+  height: 100%;
+  width: 49%;
+  background-color: gainsboro;
+}
+.child-table-bottom {
+  height: 100%;
+  width: 32%;
+  background-color: gainsboro;
 }

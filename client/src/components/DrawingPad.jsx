@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
 import { SketchField, Tools } from "react-sketch";
 import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
@@ -13,13 +13,15 @@ import CopyIcon from "@material-ui/icons/FileCopy";
 import RemoveIcon from "@material-ui/icons/Remove";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import Typography from "@material-ui/core/Typography/Typography";
-
-
 import { db } from "../services/firebase";
+import { useSelector } from "react-redux";
 
 const fabric = require("fabric").fabric;
 
+
+
 const DisplayedCanvas = (props) => {
+
   return (
     <div style={{ ...props.style }}>
       <div
@@ -50,14 +52,20 @@ const DisplayedCanvas = (props) => {
   );
 };
 
-const DrawingPad = (props) => {
+const DrawingPad = forwardRef((props, ref) => {
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
   const [lineColor, setLineColor] = useState("black");
   const [lineWidth, setLineWidth] = useState(10);
   const [controlledValue, setControlledValue] = useState(null);
   const [tool, setTool] = useState(Tools.Pencil);
-  const [isEditing, setIsEditing] = useState(true);
+  const {isEditing, roomid} = props
+
+  const selectedRoom = useSelector((state) => {
+    return state.room.room.find((v) => v.id === roomid);
+
+  });
+
 
   const refs = useRef(null);
   var _sketch = null;
@@ -67,7 +75,7 @@ const DrawingPad = (props) => {
   useEffect(() => {
     _sketch.fromJSON(initialValue);
     _sketch._onMouseDown = () => {};
-  }, [initialValue, _sketch, isEditing]);
+  }, [initialValue, _sketch]);
 
 
   // handle update to database
@@ -101,12 +109,17 @@ const DrawingPad = (props) => {
     localStorage.setItem("1111", JSON.stringify(_sketch.toJSON()));
   };
 
+
+  useImperativeHandle(ref, () => ({
+    _clear: _clear
+  }))
+
+
   const _download = () => {
     //console.save(_sketch.toDataURL(), 'toDataURL.txt');
     //console.save(JSON.stringify(_sketch.toJSON()), 'toDataJSON.txt');
 
     /*eslint-enable no-console*/
-    console.log(_sketch.toDataURL());
     window.location.href = _sketch
       .toDataURL()
       .replace("image/png", "image/octet-stream");
@@ -116,10 +129,17 @@ const DrawingPad = (props) => {
   };
 
   const _clear = () => {
-    setIsEditing((e) => !e);
+    _sketch.clear();
+    _sketch.setBackgroundFromDataUrl('');
+
+
+    setCanRedo(_sketch.canUndo());
+    setCanRedo(_sketch.canRedo());
+
   };
 
   const _onSketchChange = (e) => {
+   // console.log(isEditing);
     let prev = canUndo;
     let now = _sketch.canUndo();
     props.onDraw(JSON.stringify(_sketch.toJSON()));
@@ -181,7 +201,7 @@ const DrawingPad = (props) => {
               color="inherit"
               style={{ flexGrow: 1, color: "orange" }}
             >
-              Sketch Tool
+              {selectedRoom && selectedRoom.currentQuestion.question}
             </Typography>
             <IconButton color="primary" disabled={!canUndo} onClick={_undo}>
               <UndoIcon />
@@ -212,7 +232,7 @@ const DrawingPad = (props) => {
               color="inherit"
               style={{ flexGrow: 1, color: "orange" }}
             >
-              ... is isEditing
+              {selectedRoom && `提示 : ${selectedRoom.currentQuestion.hint}`}
             </Typography>
             <IconButton color="primary" onClick={_clear}>
               <DeleteIcon />
@@ -247,7 +267,7 @@ const DrawingPad = (props) => {
       </div>
     </div>
   );
-};
+});
 
 const styles = {
   toolbar: {
