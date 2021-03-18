@@ -7,11 +7,11 @@
 
 # Project Screen Shots
 - **Lobby**
-<img src="client/src/assets/screen1.png"/>
+<img src="client/src/assets/screen1.png"> </img>
 - **Create Room**
-<img src="client/src/assets/screen2.png">
+<img src="client/src/assets/screen2.png"> </img>
 - **In Game**
-<img src="client/src/assets/screen3.png">
+<img src="client/src/assets/screen3.png"> </img>
 # Tech/framework used
 
 - react
