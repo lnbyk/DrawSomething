@@ -1,12 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Button from "@material-ui/core/Button";
 import Room from "../models/Room";
 import "./Table.css";
 const Table = (props) => {
-  const [height, setHeight] = useState(0);
-
   const { joinHandler, gameState } = props;
-  const disabled = gameState !== Room.GAME_STATE.PREPARE;
+  const disabled = gameState === Room.GAME_STATE.INGAME;
   return (
     <div
       className="round-table"

@@ -21,12 +21,14 @@ import "firebase/analytics";
 // Add the Firebase products that you want to use
 import "firebase/auth";
 import "firebase/firestore";
+import playerReducer from "./store/reducers/player";
 
 var mysocket = new Socket();
 mysocket.onConnect(111);
 
 const rootReducer = combineReducers({
   room: roomReducer,
+  players: playerReducer
 });
 
 const store = createStore(rootReducer, applyMiddleware(thunk));
