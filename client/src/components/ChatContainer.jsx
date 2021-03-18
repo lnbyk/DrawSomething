@@ -1,10 +1,9 @@
-import { Hidden, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import Socket from "../utils/socket";
 import { sendMessage } from "../store/actions/room";
 import "./ChatContainer.css";
 import { useDispatch } from "react-redux";
-import zIndex from "@material-ui/core/styles/zIndex";
 
 const ChatContainer = (props) => {
   const [guessText, setGuessText] = useState("");
@@ -18,7 +17,6 @@ const ChatContainer = (props) => {
     socket.socket.on("loadMessages", (data) => {
       data = JSON.parse(data);
       setMessages(data);
-      console.log(messages);
     });
   }, []);
 
