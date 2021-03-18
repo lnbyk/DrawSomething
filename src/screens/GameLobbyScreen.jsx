@@ -114,7 +114,9 @@ const GameLobbyScreen = (props) => {
             height={200}
             width={200}
             joinHandler={() => joinRoom(rrrrr.id)}
+            players={rrrrr.players}
             gameState={rrrrr.state}
+            roomName={rrrrr.name}
           ></Table>
         );
       }
