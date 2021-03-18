@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import RoomCreateModal from "../components/RoomCreateModal";
 import Table from "../components/Table";
-import Room from "../models/Room";
 import Socket from "../utils/socket";
 import {
   getAllRoom,
@@ -14,22 +13,29 @@ import { v4 as uuidv4 } from "uuid";
 import { useHistory } from "react-router";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import LobbyInfoContainer from "../components/LobbyInfoContainer";
+import { getAllPlayers, GET_ALL_PLAYERS } from "../store/actions/player";
+import { Snackbar } from "@material-ui/core";
+// tables
 
-const curRoom = new Room("21313", 60, "aad", 2);
 const GameLobbyScreen = (props) => {
   const modalRef = useRef();
-  const [timeLeft, setTimeLeft] = useState(curRoom.prepare);
-  const [gameState, setGameState] = useState(Room.GAME_STATE.prepare);
   const [backDrop, setBackDrop] = useState(false);
-
+  const [showAvailableRooms, setShowAvailableRooms] = useState(false);
+  const [cancel, setCancel] = useState(false);
   const socket = Socket.getInstance();
   const allRooms = useSelector((state) => {
+    if (showAvailableRooms) {
+      return state.room.room.filter((v) => !v.isPlaying);
+    }
     return state.room.room;
   });
 
+  console.log(allRooms);
+
+  const allPlayers = useSelector((state) => state.players.players);
   const dispatch = useDispatch();
   const history = useHistory();
-
   useEffect(() => {
     socket.socket.on("allRooms", (rooms) => {
       rooms = JSON.parse(rooms);
@@ -42,6 +48,15 @@ const GameLobbyScreen = (props) => {
     socket.socket.on("jointRoom", (room) => {
       room = JSON.parse(room);
       dispatch(jointRoom(room));
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    socket.socket.on("allPlayers", (player) => {
+      player = JSON.parse(player);
+      console.log(player);
+      dispatch(getAllPlayers(player));
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -73,7 +88,8 @@ const GameLobbyScreen = (props) => {
         });
       } catch (err) {
         console.log(err);
-        alert("cancel");
+        setCancel(true);
+        await new Promise((resolve) => setTimeout(() => resolve(setCancel(false)), 800));
       }
     }, 100);
   };
@@ -118,19 +134,24 @@ const GameLobbyScreen = (props) => {
 
   return (
     <div className="container" id="lobby">
+      <Snackbar
+        anchorOrigin={{  vertical: 'top', horizontal: 'center' }}
+        open={cancel}
+        ContentProps={{
+          "aria-describedby": "message-id",
+        }}
+        message={<span id="message-id">Cancel</span>}
+      />
       <Backdrop style={{ zIndex: 20 }} open={backDrop}>
         <CircularProgress color="inherit" />
       </Backdrop>
-      <button onClick={createRoom}>open </button>
       <RoomCreateModal ref={modalRef} />
       <div className="tables-container">{rooms}</div>
-      <div style={{ textAlign: "center" }}>
-        {gameState === Room.GAME_STATE.prepare ? (
-          <b> {"preparing " + timeLeft + " left"}</b>
-        ) : (
-          <b>{"Time remaining " + timeLeft}</b>
-        )}
-      </div>
+      <LobbyInfoContainer
+        createRoom={createRoom}
+        players={allPlayers}
+        showAvailableRooms={() => setShowAvailableRooms((e) => !e)}
+      />
     </div>
   );
 };

@@ -1,16 +1,9 @@
-export const GET_ROOM_WITH_ID = "GET_ROOM_WITH_ID";
-export const GET_OUT = "GET_OUT";
-export const GET_USER_IN_ROOM = "GET_USER_IN_ROOM"
+export const GET_ALL_PLAYERS = "GET_ALL_PLAYERS";
 
-export const getRoomWithId = (id) => {
+
+export const getAllPlayers = (players) => {
   return {
-    type: GET_USER_IN_ROOM,
-    roomId: id,
+    type: GET_ALL_PLAYERS,
+    players: players,
   };
 };
-
-export const getOut = () => {
-  return {
-    type: GET_OUT,
-  }
-}

@@ -1,8 +1,14 @@
-import React, { useState, useRef, useEffect, forwardRef, useImperativeHandle } from "react";
-import { SketchField, Tools } from "react-sketch";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
+import { SketchField } from "react-sketch";
 import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
-
+import { CompactPicker, CirclePicker } from "react-color";
 import UndoIcon from "@material-ui/icons/Undo";
 import RedoIcon from "@material-ui/icons/Redo";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -13,15 +19,46 @@ import CopyIcon from "@material-ui/icons/FileCopy";
 import RemoveIcon from "@material-ui/icons/Remove";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import Typography from "@material-ui/core/Typography/Typography";
-import { db } from "../services/firebase";
 import { useSelector } from "react-redux";
+import {
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
+} from "@material-ui/core";
 
+// select icons
+import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
+import CreateIcon from "@material-ui/icons/Create";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import Crop75Icon from "@material-ui/icons/Crop75";
 const fabric = require("fabric").fabric;
 
-
+const Tools = [
+  {
+    name: "pencil",
+    render: <CreateIcon />,
+  },
+  {
+    name: "circle",
+    render: <RadioButtonUncheckedIcon />,
+  },
+  {
+    name: "arrow",
+    render: <ArrowForwardIcon />,
+  },
+  {
+    name: "line",
+    render: <RemoveIcon />,
+  },
+  {
+    name: "rectangle",
+    render: <Crop75Icon />,
+  },
+];
 
 const DisplayedCanvas = (props) => {
-
   return (
     <div style={{ ...props.style }}>
       <div
@@ -58,14 +95,12 @@ const DrawingPad = forwardRef((props, ref) => {
   const [lineColor, setLineColor] = useState("black");
   const [lineWidth, setLineWidth] = useState(10);
   const [controlledValue, setControlledValue] = useState(null);
-  const [tool, setTool] = useState(Tools.Pencil);
-  const {isEditing, roomid} = props
+  const [tool, setTool] = useState(Tools[0].name);
+  const { isEditing, roomid } = props;
 
   const selectedRoom = useSelector((state) => {
     return state.room.room.find((v) => v.id === roomid);
-
   });
-
 
   const refs = useRef(null);
   var _sketch = null;
@@ -76,7 +111,6 @@ const DrawingPad = forwardRef((props, ref) => {
     _sketch.fromJSON(initialValue);
     _sketch._onMouseDown = () => {};
   }, [initialValue, _sketch]);
-
 
   // handle update to database
   //  useEffect( () => {
@@ -91,29 +125,36 @@ const DrawingPad = forwardRef((props, ref) => {
   //   }
   // },[_sketch])
 
-
-
+  const _selectTool = (v) => {
+    setTool(v.target.value);
+  };
   const _undo = () => {
-    _sketch.undo();
-    setCanUndo(_sketch.canUndo());
-    setCanRedo(_sketch.canRedo());
+    try {
+      _sketch.undo();
+      setCanUndo(_sketch.canUndo());
+      setCanRedo(_sketch.canRedo());
+    } catch (err) {
+      console.log("undo error", err);
+    }
   };
 
   const _redo = () => {
-    _sketch.redo();
-    setCanUndo(_sketch.canUndo());
-    setCanRedo(_sketch.canRedo());
+    try {
+      _sketch.redo();
+      setCanUndo(_sketch.canUndo());
+      setCanRedo(_sketch.canRedo());
+    } catch (err) {
+      console.log("redo error", err);
+    }
   };
 
   const _save = () => {
     localStorage.setItem("1111", JSON.stringify(_sketch.toJSON()));
   };
 
-
   useImperativeHandle(ref, () => ({
-    _clear: _clear
-  }))
-
+    _clear: _clear,
+  }));
 
   const _download = () => {
     //console.save(_sketch.toDataURL(), 'toDataURL.txt');
@@ -130,22 +171,22 @@ const DrawingPad = forwardRef((props, ref) => {
 
   const _clear = () => {
     _sketch.clear();
-    _sketch.setBackgroundFromDataUrl('');
+    _sketch.setBackgroundFromDataUrl("");
 
-
-    setCanRedo(_sketch.canUndo());
+    setCanUndo(_sketch.canUndo)
     setCanRedo(_sketch.canRedo());
-
   };
 
   const _onSketchChange = (e) => {
-   // console.log(isEditing);
-    let prev = canUndo;
-    let now = _sketch.canUndo();
-    props.onDraw(JSON.stringify(_sketch.toJSON()));
-    if (prev !== now) {
-      setCanUndo(now);
-    }
+    // console.log(isEditing);
+    try {
+      let prev = canUndo;
+      let now = _sketch.canUndo();
+      props.onDraw(JSON.stringify(_sketch.toJSON()));
+      if (prev !== now) {
+        setCanUndo(now);
+      }
+    } catch (err) {}
   };
 
   const passCanvasHandler = (c) => {
@@ -193,7 +234,7 @@ const DrawingPad = forwardRef((props, ref) => {
 
   return (
     <div>
-      <div>
+      <div height="10%">
         {isEditing ? (
           <Toolbar style={{ ...styles.toolbar, display: isEditing }}>
             <Typography
@@ -241,7 +282,7 @@ const DrawingPad = forwardRef((props, ref) => {
         )}
       </div>
 
-      <div>
+      <div height="80%">
         {isEditing ? (
           <SketchField
             name="sketch"
@@ -250,7 +291,7 @@ const DrawingPad = forwardRef((props, ref) => {
             lineColor={lineColor}
             lineWidth={lineWidth}
             fillColor={"transparent"}
-            height={700}
+            height={630}
             backgroundColor={"transparent"}
             defaultValue={initialValue}
             value={controlledValue}
@@ -260,11 +301,55 @@ const DrawingPad = forwardRef((props, ref) => {
           />
         ) : (
           <DisplayedCanvas
-            style={{ width: "100%", height: 700 }}
+            style={{ width: "100%", height: 630 }}
             passCanvasHandler={passCanvasHandler}
           />
         )}
       </div>
+      {isEditing ?
+      <div>
+        <Toolbar
+          style={{
+            ...styles.toolbar,
+            backgroundColor: 'lightgray',
+            zIndex: 4,
+            display: "flex",
+            padding: 5,
+            justifyContent: "space-around",
+          }}
+        >
+          <FormControl variant="outlined" style={{ width: "20%" }}>
+            <InputLabel id="demo-simple-select-outlined-label">
+              tools
+            </InputLabel>
+
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              value={tool}
+              label="Age"
+              onChange={_selectTool}
+            >
+              {Tools.map((v) => {
+                return (
+                  <MenuItem value={v.name} key={v.name}>
+                    <div style={{ display: "flex" }}>
+                      {v.render} {v.name}
+                    </div>
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+
+          <CirclePicker
+            id="lineColor"
+            color={lineColor}
+            onChange={(color) => setLineColor(color.hex)}
+            width="50%"
+          />
+        </Toolbar>
+      </div> : null}
     </div>
   );
 });
@@ -272,6 +357,8 @@ const DrawingPad = forwardRef((props, ref) => {
 const styles = {
   toolbar: {
     backgroundColor: "#333",
+    border: "solid 1px",
+    boxShadow: `0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)`,
   },
 };
 

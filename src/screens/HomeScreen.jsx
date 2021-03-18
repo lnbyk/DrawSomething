@@ -16,6 +16,7 @@ import {
   prepare,
 } from "../store/actions/room";
 import { useDispatch, useSelector } from "react-redux";
+import CustomButton from "../components/CustomButton";
 import CheckIcon from "@material-ui/icons/Check";
 import "../App.css";
 
@@ -34,7 +35,6 @@ const HomeScreen = (props) => {
 
   const drawingPadRef = useRef();
   const selectedRoom = useSelector((state) => {
-    console.log(state.room.currentIn);
     return state.room.currentIn;
     // return state.room.room.find((v) => v.id === props.location.state.roomid);
   });
@@ -63,7 +63,8 @@ const HomeScreen = (props) => {
               data.players.find((v) => v !== null && v.id === data.owner)
                 .isEditing && socket.socket.id === data.owner
             );
-            drawingPadRef.current._clear();
+
+            drawingPadRef.current && drawingPadRef.current._clear();
             break;
           case ROUND_STATE.DRAWING:
             setGameState("drawing:");
@@ -118,15 +119,10 @@ const HomeScreen = (props) => {
     return (
       <div className="prepareContainer">
         {" "}
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: "#00FF00",
-            width: "46%",
-            height: "70%",
-            borderRadius: "30px",
-            borderWidth: "2px 2px",
-          }}
+        <CustomButton
+          backgroundColor="#00FF00"
+          width="46%"
+          height="70%"
           onClick={isOwner ? onStart : onPrepare}
         >
           {isOwner ? (
@@ -160,21 +156,15 @@ const HomeScreen = (props) => {
               </div>
             </div>
           )}
-        </Button>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: "red",
-            width: "46%",
-            height: "70%",
-            borderRadius: "30px",
-            border: "solid gray",
-            borderWidth: "2px 2px",
-          }}
+        </CustomButton>
+        <CustomButton
+          backgroundColor="red"
+          width="46%"
+          height="70%"
           onClick={onExit}
         >
           Exit
-        </Button>
+        </CustomButton>
       </div>
     );
   };

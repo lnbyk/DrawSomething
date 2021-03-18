@@ -3,7 +3,8 @@ import TextField from "@material-ui/core/TextField";
 import MenuItem from "@material-ui/core/MenuItem";
 import Button from "@material-ui/core/Button";
 import Room from "../models/Room";
-import Socket from '../utils/socket'
+import Socket from "../utils/socket";
+import CustomButton from "./CustomButton";
 import "./RoomCreateModal.css";
 
 const timeRange = [60, 70, 80, 90, 100];
@@ -16,7 +17,7 @@ const RoomCreateModal = forwardRef((props, ref) => {
   const [personLimit, setPersonLimit] = useState(personLimits[0]);
   const [isShow, setIsShow] = useState(false);
   const [promiseInfo, setPromiseInfo] = useState(null);
-  const socket = new Socket().socket
+  const socket = new Socket().socket;
 
   const roomNameHandler = (e) => {
     setRoomName(e.target.value);
@@ -113,34 +114,23 @@ const RoomCreateModal = forwardRef((props, ref) => {
         className="create-button-container"
         style={{ height: "13.5", width: "75" }}
       >
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: "red",
-            width: `20% !important`,
-            height: "100%",
-            borderRadius: "40px",
-            border: "solid #f7d9d9",
-            borderWidth: "2px 2px",
-          }}
+        <CustomButton
+          backgroundColor="red"
+          height="100%"
+          border="solid #f7d9d9"
           onClick={cancelHandler}
         >
-          cancel{" "}
-        </Button>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: "#f9f3f3",
-            width: `20% !important`,
-            height: "100%",
-            borderRadius: "40px",
-            border: "solid gray",
-            borderWidth: "2px 2px",
-          }}
+          cancel
+        </CustomButton>
+
+        <CustomButton
+          backgroundColor="#f9f3f3"
+          height="100%"
+          border="solid gray"
           onClick={createHandler}
         >
-          create{" "}
-        </Button>
+          create
+        </CustomButton>
       </div>
     </div>
   );
