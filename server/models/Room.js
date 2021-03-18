@@ -117,6 +117,12 @@ class Room {
             resolve();
         }
 
+        if (this.isEmpty()) {
+          this.curRound = this.totalRound + 1;
+          clearInterval(interval);
+          resolve();
+        }
+
         console.log(this.roundTimer);
 
         if (this.roundTimer === 0) {
@@ -151,6 +157,7 @@ class Room {
   };
 
   start = async () => {
+    this.isPlaying = true;
     this.totalRound = this.curPlayers * 2;
     this.state = Room.GAME_STATE.INGAME;
     this.totalRound = 1;
@@ -163,6 +170,7 @@ class Room {
       this.nextPlayer();
     }
     this.state = Room.GAME_STATE.FINISH;
+    this.isPlaying = false;
   };
 
   starts = () => {

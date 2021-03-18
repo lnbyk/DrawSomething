@@ -6,7 +6,12 @@
   other player should guess. If they guess correct, they will get the points.</pre>
 
 # Project Screen Shots
-
+- **Lobby**
+<img src="client/src/assets/screen1.png"/>
+- **Create Room**
+<img src="client/src/assets/screen2.png">
+- **In Game**
+<img src="client/src/assets/screen3.png">
 # Tech/framework used
 
 - react

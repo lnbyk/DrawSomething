@@ -29,6 +29,9 @@ io.on("connection", (socket) => {
     console.log(player);
   });
 
+  // send all players to client
+  io.sockets.emit("allPlayers", JSON.stringify([...players.values()]));
+
   // create a new room or join a room
   socket.on("createRoom", async (game) => {
     game = JSON.parse(game);
@@ -79,9 +82,23 @@ io.on("connection", (socket) => {
       let result = await curInRoom.canStart();
       socket.emit("room_feedback", result);
       curInRoom.start();
+      socket.emit("allRooms", JSON.stringify([...rooms.values()]));
+      socket.broadcast.emit("allRooms", JSON.stringify([...rooms.values()]));
+
       let roomTimer = setInterval(() => {
-        if (curInRoom.state === Room.GAME_STATE.FINISH) {
+        if (curInRoom.state === Room.GAME_STATE.FINISH || curInRoom.isEmpty()) {
           console.log("GAME ENDS !");
+
+          if (curInRoom.isEmpty()) {
+            rooms.delete(curInRoom.id);
+          }
+
+          socket.emit("allRooms", JSON.stringify([...rooms.values()]));
+          socket.broadcast.emit(
+            "allRooms",
+            JSON.stringify([...rooms.values()])
+          );
+
           clearInterval(roomTimer);
         } else {
           socket.emit("roomPlaying", JSON.stringify(curInRoom));
@@ -133,6 +150,8 @@ io.on("connection", (socket) => {
         currentPlayer.guessed.add(currentRoom.curRound);
         currentPlayer.points += 2;
         currentRoom.curCorrect += 1;
+        socket.emit("jointRoom", JSON.stringify(rooms.get(roomid)));
+        socket.to(roomid).emit("jointRoom", JSON.stringify(rooms.get(roomid)));
         socket.emit("allRooms", JSON.stringify([...rooms.values()]));
         socket.broadcast.emit("allRooms", JSON.stringify([...rooms.values()]));
       }
@@ -165,13 +184,12 @@ io.on("connection", (socket) => {
 
   function leaveRoom() {
     try {
-      console.log(111)
-      console.log([...rooms.values()])
-      let curInRoom = [...rooms.values()].find((v) => 
+      console.log(111);
+      console.log([...rooms.values()]);
+      let curInRoom = [...rooms.values()].find((v) =>
         v.players.some((v) => v && v.id === socket.id)
       );
 
-    
       console.log(curInRoom);
       curInRoom.leave(socket.id, () => {
         socket.emit("jointRoom", JSON.stringify(curInRoom));
@@ -181,12 +199,10 @@ io.on("connection", (socket) => {
         }
       });
 
-
-
       socket.emit("allRooms", JSON.stringify([...rooms.values()]));
       socket.broadcast.emit("allRooms", JSON.stringify([...rooms.values()]));
     } catch (err) {
-      console.log(err)
+      console.log(err);
       socket.emit("message", err.error);
     }
   }
