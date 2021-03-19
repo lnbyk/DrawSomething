@@ -6,6 +6,7 @@
   position: relative;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4), 0 6px 20px 0 rgba(0, 0, 0, 0.4);
   margin: 2%;
+  margin-bottom: 6%;
 }
 
 .round-table-top {
@@ -42,9 +43,11 @@
   height: 100%;
   width: 49%;
   background-color: gainsboro;
+  background-size: contain;
 }
 .child-table-bottom {
   height: 100%;
   width: 32%;
   background-color: gainsboro;
+  background-size: contain;
 }

@@ -4,7 +4,7 @@ class Room {
     INGAME : "INGAME"
   }
 
-  constructor(id, timeLimit, name, maxPlayer) {
+  constructor(id, timeLimit, name, maxPlayer, roomPassord) {
     this.id = id;
     this.name = name;
     this.isPlaying = false;
@@ -14,6 +14,7 @@ class Room {
     this.totalRound = 0;
     this.curRound = 0;
     this.prepare = 20;
+    this.password = roomPassord;
     this.state = Room.GAME_STATE.prepare
   }
 

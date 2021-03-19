@@ -1,23 +1,57 @@
 import React from "react";
 import Button from "@material-ui/core/Button";
 import Room from "../models/Room";
+import draingPad from "../assets/draingPad.png";
+import draingPadBW from "../assets/draingPadBW.png";
 import "./Table.css";
 const Table = (props) => {
-  const { joinHandler, gameState } = props;
+  const { joinHandler, gameState, players, roomName } = props;
   const disabled = gameState === Room.GAME_STATE.INGAME;
+  const topPlayer = players.slice(0, 2);
+  const bottomPlayer = players.slice(2, 5);
+
+  const isLock = false
+
+  const Seat = (props) => {
+    return (
+      <div
+        className={props.className}
+        style={{
+          backgroundImage: `url(${props.v === null ? draingPadBW : draingPad})`,
+          cursor: props.v === null ? "pointer" : "",
+        }}
+        onClick={props.v !== null ? () => {} : joinHandler}
+      ></div>
+    );
+  };
+
   return (
     <div
       className="round-table"
       style={{ width: props.width, height: props.height }}
     >
+      <div
+        id="lock"
+        style={{
+          textAlign: "center",
+          position: "absolute",
+          top: 0,
+          width: "100%",
+          textAlign: "center",
+          display:isLock ? "":"none"
+        }}
+      >
+        <b>🔒</b>
+      </div>
       <div className="round-table-top">
-        <div className="child-table"></div>
-        <div className="child-table"></div>
+        {topPlayer.map((v) => (
+          <Seat v={v} className="child-table" />
+        ))}
       </div>
       <div className="round-table-bottom">
-        <div className="child-table-bottom"></div>
-        <div className="child-table-bottom"></div>{" "}
-        <div className="child-table-bottom"></div>
+        {bottomPlayer.map((v) => (
+          <Seat v={v} className="child-table-bottom" />
+        ))}
       </div>
       <Button
         variant="contained"
@@ -39,6 +73,18 @@ const Table = (props) => {
       >
         {disabled ? "IN-GAME " : "JOIN"}
       </Button>
+
+      <div
+        style={{
+          color: "lightgray",
+          position: "absolute",
+          bottom: "-13%",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
+        <b> {roomName === "" ? "gameRoom" : roomName}</b>
+      </div>
     </div>
   );
 };

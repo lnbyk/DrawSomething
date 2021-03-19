@@ -91,7 +91,4 @@ const LobbyInfoContainer = (props) => {
   );
 };
 
-function createData(name, id) {
-  return { name, id };
-}
 export default LobbyInfoContainer;
