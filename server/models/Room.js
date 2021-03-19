@@ -29,7 +29,7 @@ class Room {
     },
   ];
 
-  constructor(id, timeLimit, name, maxPlayer, owner) {
+  constructor(id, timeLimit, name, maxPlayer, owner, password) {
     this.id = id;
     this.name = name;
     this.owner = owner;
@@ -47,6 +47,7 @@ class Room {
     this.round_state = Room.GAME_STATE.PREPARE;
     this.currentQuestion = Room.QUESTION_SETS[0];
     this.curCorrect = 0;
+    this.password = password;
   }
 
   addPlayer = async (p) => {
@@ -71,11 +72,11 @@ class Room {
   };
 
   leave = (p, callback) => {
-    console.log(1)
+    console.log(1);
     //this.players.find(v => v.id === p) = null
-    this.players[this.players.findIndex(v => v.id === p)] = null
+    this.players[this.players.findIndex((v) => v.id === p)] = null;
     this.curPlayers--;
-    console.log(this.players)
+    console.log(this.players);
     callback();
   };
 
@@ -113,8 +114,8 @@ class Room {
               Math.floor(Math.random() * Room.QUESTION_SETS.length)
             ];
 
-            clearInterval(interval);
-            resolve();
+          clearInterval(interval);
+          resolve();
         }
 
         if (this.isEmpty()) {
@@ -160,7 +161,6 @@ class Room {
     this.isPlaying = true;
     this.totalRound = this.curPlayers * 2;
     this.state = Room.GAME_STATE.INGAME;
-    this.totalRound = 1;
     while (this.curRound <= this.totalRound) {
       // alert(1)
       console.log(`current editing ${this.currentEditing}`);
@@ -168,6 +168,7 @@ class Room {
       this.curRound++;
 
       this.nextPlayer();
+      console.log(`current editing ${this.currentEditing}`);
     }
     this.state = Room.GAME_STATE.FINISH;
     this.isPlaying = false;
@@ -179,20 +180,22 @@ class Room {
   };
 
   nextPlayer = () => {
-    var curIndex =
-      (this.players.findIndex((v) => v.id === this.currentEditing) + 1) %
-      this.players.length;
+    var curIndex = this.players.findIndex((v) => v.id === this.currentEditing);
+    this.players[curIndex].isEditing = false;
+    curIndex = (curIndex + 1) % this.players.length;
 
-    while ((curIndex %= this.players.length < this.players.length)) {
+    while (curIndex < this.players.length) {
       var nextReadyPlayer = this.players[curIndex];
       if (nextReadyPlayer !== null) {
-        console.log(nextReadyPlayer);
+        this.players[curIndex].isEditing = true;
         this.currentEditing = nextReadyPlayer.id;
         return;
       }
       curIndex++;
+      if (curIndex === this.players.length) curIndex = 0;
     }
   };
+  
 }
 
 module.exports = Room;

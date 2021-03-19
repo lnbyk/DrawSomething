@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
   // create a new room or join a room
   socket.on("createRoom", async (game) => {
     game = JSON.parse(game);
-    const { id, timeLimit, name, maxPlayer } = game;
+    const { id, timeLimit, name, maxPlayer, password} = game;
     console.log("craeteRoom by " + socket.id);
     if (rooms.has(id)) {
       var a = rooms.get(id);
@@ -50,7 +50,7 @@ io.on("connection", (socket) => {
         socket.emit("room_feedback", err);
       }
     } else {
-      var fff = new Room(id, timeLimit, name, maxPlayer, socket.id);
+      var fff = new Room(id, timeLimit, name, maxPlayer, socket.id, password);
       var player = players.get(socket.id);
       player.isEditing = true;
       fff.addPlayer(player);
@@ -101,9 +101,12 @@ io.on("connection", (socket) => {
 
           clearInterval(roomTimer);
         } else {
+          console.log(curInRoom.currentEditing)
           socket.emit("roomPlaying", JSON.stringify(curInRoom));
-          console.log(roomid);
+          socket.emit("jointRoom",JSON.stringify(rooms.get(roomid)));
+          socket.to(roomid).emit("jointRoom",JSON.stringify(rooms.get(roomid)));
           socket.to(roomid).emit("roomPlaying", JSON.stringify(curInRoom));
+
           // switch (curInRoom.round_state) {
           //   case Room.ROUND_STATE.PREPARE:
           //     console.log(
