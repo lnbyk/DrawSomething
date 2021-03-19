@@ -5,10 +5,12 @@ import draingPad from "../assets/draingPad.png";
 import draingPadBW from "../assets/draingPadBW.png";
 import "./Table.css";
 const Table = (props) => {
-  const { joinHandler, gameState, players, roomName} = props;
+  const { joinHandler, gameState, players, roomName } = props;
   const disabled = gameState === Room.GAME_STATE.INGAME;
   const topPlayer = players.slice(0, 2);
   const bottomPlayer = players.slice(2, 5);
+
+  const isLock = false
 
   const Seat = (props) => {
     return (
@@ -28,6 +30,19 @@ const Table = (props) => {
       className="round-table"
       style={{ width: props.width, height: props.height }}
     >
+      <div
+        id="lock"
+        style={{
+          textAlign: "center",
+          position: "absolute",
+          top: 0,
+          width: "100%",
+          textAlign: "center",
+          display:isLock ? "":"none"
+        }}
+      >
+        <b>🔒</b>
+      </div>
       <div className="round-table-top">
         {topPlayer.map((v) => (
           <Seat v={v} className="child-table" />
@@ -59,7 +74,15 @@ const Table = (props) => {
         {disabled ? "IN-GAME " : "JOIN"}
       </Button>
 
-      <div style={{ color: 'lightgray', position: "absolute", bottom: '-13%', width:'100%', textAlign:'center'}}>
+      <div
+        style={{
+          color: "lightgray",
+          position: "absolute",
+          bottom: "-13%",
+          width: "100%",
+          textAlign: "center",
+        }}
+      >
         <b> {roomName === "" ? "gameRoom" : roomName}</b>
       </div>
     </div>

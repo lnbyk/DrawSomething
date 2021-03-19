@@ -60,8 +60,7 @@ const HomeScreen = (props) => {
             setGameState("preparing:");
             setTimeLeft(data.prepare);
             setIsEditing(
-              data.players.find((v) => v !== null && v.id === data.owner)
-                .isEditing && socket.socket.id === data.owner
+              data.currentEditing === socket.socket.id
             );
 
             drawingPadRef.current && drawingPadRef.current._clear();
@@ -70,8 +69,7 @@ const HomeScreen = (props) => {
             setGameState("drawing:");
             setTimeLeft(data.roundTimer);
             setIsEditing(
-              data.players.find((v) => v !== null && v.id === data.owner)
-                .isEditing && socket.socket.id === data.owner
+              data.currentEditing === socket.socket.id
             );
             break;
           default:
@@ -182,6 +180,7 @@ const HomeScreen = (props) => {
             else
               return (
                 <PlayerCard
+                  key={val.id}
                   name={val.name}
                   isEditing={val.isEditing}
                   score={"score: " + val.points}
@@ -201,8 +200,8 @@ const HomeScreen = (props) => {
       </div>
       <div className="chat-container">
         <div className="globalTimer">
-          <text>{gameState}</text>
-          <text style={{ color: "yellowgreen" }}>{timeLeft}</text>
+          <p>{gameState}</p>
+          <p style={{ color: "yellowgreen" }}>{timeLeft}</p>
         </div>
         <ChatContainer
           isEditing={isEditing}

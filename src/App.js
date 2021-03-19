@@ -43,7 +43,6 @@ const App = () => {
               <Redirect to="/lobby" />
             </Route>
             <Route exact path="/lobby" component={GameLobbyScreen} />
-            <Route exact path="/test" component={RoomCreateModal} />
             <Route
               path={`/gameroom/:id`}
               render={(props) => {
