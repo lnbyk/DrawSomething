@@ -5,7 +5,7 @@ import a from "../logo.svg";
 const PlayerCard = (props) => {
     //f6dfeb
 
-    const isEditingMessage = props.isEditing === null ? "" : props.isEditing ? "Editing":  "Guessing"
+    const isEditingMessage = props.isEditing === undefined? "" : (props.isEditing ? "Editing":  "Guessing")
     const bgColor = props.isEditing ? '#a1cae2' :'white';
   return (
     <div className="PlayCard" style={{ ...props.style, backgroundColor:bgColor}}>
