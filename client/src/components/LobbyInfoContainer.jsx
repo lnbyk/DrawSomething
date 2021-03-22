@@ -7,11 +7,10 @@ import TableRow from "@material-ui/core/TableRow";
 import Tables from "@material-ui/core/Table";
 import CustomButton from "./CustomButton";
 import "../App.css";
+import { Backdrop, CircularProgress } from "@material-ui/core";
 const LobbyInfoContainer = (props) => {
-
-  const [aButtonText, setAButtonText] = useState("available rooms")
+  const [aButtonText, setAButtonText] = useState("available rooms");
   const { createRoom, players, showAvailableRooms } = props;
-
 
   const columns = [
     { id: "name", label: "Name", minWidth: 120 },
@@ -36,6 +35,9 @@ const LobbyInfoContainer = (props) => {
       </div>
       <div className="players-info">
         <TableContainer style={{ minHeight: "100%" }}>
+          <Backdrop style={{ zIndex: 20 }} open={false}>
+            <CircularProgress color="inherit" />
+          </Backdrop>
           <Tables stickyHeader aria-label="sticky table" size="small">
             <TableHead>
               <TableRow>
@@ -82,7 +84,12 @@ const LobbyInfoContainer = (props) => {
         <CustomButton
           backgroundColor="lightblue"
           width="80%"
-          onClick={() => {showAvailableRooms(); setAButtonText(e => e === "available rooms" ? "all rooms" : "available rooms" )}}
+          onClick={() => {
+            showAvailableRooms();
+            setAButtonText((e) =>
+              e === "available rooms" ? "all rooms" : "available rooms"
+            );
+          }}
         >
           {aButtonText}
         </CustomButton>

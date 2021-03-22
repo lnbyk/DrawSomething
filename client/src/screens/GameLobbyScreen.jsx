@@ -27,6 +27,7 @@ const GameLobbyScreen = (props) => {
   const [backDrop, setBackDrop] = useState(false);
   const [showAvailableRooms, setShowAvailableRooms] = useState(false);
   const [cancel, setCancel] = useState(false);
+  const [loadPlayers, setLoadPlayers] = useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState("");
   const socket = Socket.getInstance();
   const allRooms = useSelector((state) => {
@@ -41,11 +42,13 @@ const GameLobbyScreen = (props) => {
   const allPlayers = useSelector((state) => state.players.players);
   const dispatch = useDispatch();
   const history = useHistory();
-  useEffect(() => {
-    socket.socket.on("allRooms", (rooms) => {
-      rooms = JSON.parse(rooms);
-      dispatch(getAllRoom(rooms));
+  useEffect(async () => {
+    setBackDrop(true);
+    const rooms = await new Promise((resolve) => {
+      socket.socket.on("allRooms", (rooms) => resolve(JSON.parse(rooms)));
     });
+    setBackDrop(false);
+    dispatch(getAllRoom(rooms));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -57,12 +60,15 @@ const GameLobbyScreen = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    socket.socket.on("allPlayers", (player) => {
-      player = JSON.parse(player);
-      console.log(player);
-      dispatch(getAllPlayers(player));
-    });
+  useEffect(async () => {
+    setLoadPlayers(true);
+    const player = await new Promise((resolve) => {
+      socket.socket.on("allPlayers", (player) => {
+        resolve(JSON.parse(player));
+      });
+    })
+    dispatch(getAllPlayers(player));
+    setLoadPlayers(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -184,6 +190,7 @@ const GameLobbyScreen = (props) => {
         createRoom={createRoom}
         players={allPlayers}
         showAvailableRooms={() => setShowAvailableRooms((e) => !e)}
+        backDrop={loadPlayers}
       />
     </div>
   );
