@@ -37,4 +37,4 @@
   <pre>npm start </pre>
 
 ## Live demo
-<pre> https://dazzling-jang-9f660f.netlify.app/lobby </pre>
+<pre> https://dazzling-jang-9f660f.netlify.app </pre>
