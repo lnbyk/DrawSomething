@@ -37,4 +37,4 @@
   <pre>npm start </pre>
 
 ## Live demo
-<pre> https://dazzling-jang-9f660f.netlify.app </pre>
+- [Draw-Something](https://dazzling-jang-9f660f.netlify.app/)
