@@ -1,23 +1,25 @@
 {
   "files": {
-    "main.css": "/static/css/main.b89ade6a.chunk.css",
-    "main.js": "/static/js/main.994b1a3a.chunk.js",
-    "main.js.map": "/static/js/main.994b1a3a.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.25bd6ff4.js",
-    "runtime-main.js.map": "/static/js/runtime-main.25bd6ff4.js.map",
-    "static/js/2.08b03387.chunk.js": "/static/js/2.08b03387.chunk.js",
-    "static/js/2.08b03387.chunk.js.map": "/static/js/2.08b03387.chunk.js.map",
-    "static/js/3.affd3d30.chunk.js": "/static/js/3.affd3d30.chunk.js",
-    "static/js/3.affd3d30.chunk.js.map": "/static/js/3.affd3d30.chunk.js.map",
-    "index.html": "/index.html",
-    "static/css/main.b89ade6a.chunk.css.map": "/static/css/main.b89ade6a.chunk.css.map",
-    "static/js/2.08b03387.chunk.js.LICENSE.txt": "/static/js/2.08b03387.chunk.js.LICENSE.txt",
-    "static/media/logo.6ce24c58.svg": "/static/media/logo.6ce24c58.svg"
+    "main.css": "/DrawSomething/static/css/main.3c60f593.chunk.css",
+    "main.js": "/DrawSomething/static/js/main.f7d33ddd.chunk.js",
+    "main.js.map": "/DrawSomething/static/js/main.f7d33ddd.chunk.js.map",
+    "runtime-main.js": "/DrawSomething/static/js/runtime-main.912660ac.js",
+    "runtime-main.js.map": "/DrawSomething/static/js/runtime-main.912660ac.js.map",
+    "static/js/2.39d2ee12.chunk.js": "/DrawSomething/static/js/2.39d2ee12.chunk.js",
+    "static/js/2.39d2ee12.chunk.js.map": "/DrawSomething/static/js/2.39d2ee12.chunk.js.map",
+    "static/js/3.7afbe05f.chunk.js": "/DrawSomething/static/js/3.7afbe05f.chunk.js",
+    "static/js/3.7afbe05f.chunk.js.map": "/DrawSomething/static/js/3.7afbe05f.chunk.js.map",
+    "index.html": "/DrawSomething/index.html",
+    "static/css/main.3c60f593.chunk.css.map": "/DrawSomething/static/css/main.3c60f593.chunk.css.map",
+    "static/js/2.39d2ee12.chunk.js.LICENSE.txt": "/DrawSomething/static/js/2.39d2ee12.chunk.js.LICENSE.txt",
+    "static/media/draingPad.aedcfbb4.png": "/DrawSomething/static/media/draingPad.aedcfbb4.png",
+    "static/media/draingPadBW.2f644edf.png": "/DrawSomething/static/media/draingPadBW.2f644edf.png",
+    "static/media/logo.6ce24c58.svg": "/DrawSomething/static/media/logo.6ce24c58.svg"
   },
   "entrypoints": [
-    "static/js/runtime-main.25bd6ff4.js",
-    "static/js/2.08b03387.chunk.js",
-    "static/css/main.b89ade6a.chunk.css",
-    "static/js/main.994b1a3a.chunk.js"
+    "static/js/runtime-main.912660ac.js",
+    "static/js/2.39d2ee12.chunk.js",
+    "static/css/main.3c60f593.chunk.css",
+    "static/js/main.f7d33ddd.chunk.js"
   ]
 }
