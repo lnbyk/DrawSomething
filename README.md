@@ -35,3 +35,6 @@
   <pre>cd server && npm install </pre>
   - **Installation:** <br>
   <pre>npm start </pre>
+
+## Live demo
+<pre> https://dazzling-jang-9f660f.netlify.app/lobby </pre>
