@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from "react";
-import Button from "@material-ui/core/Button";
 import PlayerCard from "../components/PlayCard";
 import DrawingPad from "../components/DrawingPad";
 import ChatContainer from "../components/ChatContainer";
@@ -59,18 +58,14 @@ const HomeScreen = (props) => {
           case ROUND_STATE.PREPARE:
             setGameState("preparing:");
             setTimeLeft(data.prepare);
-            setIsEditing(
-              data.currentEditing === socket.socket.id
-            );
+            setIsEditing(data.currentEditing === socket.socket.id);
 
             drawingPadRef.current && drawingPadRef.current._clear();
             break;
           case ROUND_STATE.DRAWING:
             setGameState("drawing:");
             setTimeLeft(data.roundTimer);
-            setIsEditing(
-              data.currentEditing === socket.socket.id
-            );
+            setIsEditing(data.currentEditing === socket.socket.id);
             break;
           default:
             break;
@@ -78,6 +73,7 @@ const HomeScreen = (props) => {
       } else if ((data.state = GAME_STATE.FINISH)) {
         setGameState("waiting");
         setTimeLeft("");
+        setIsEditing(false);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps

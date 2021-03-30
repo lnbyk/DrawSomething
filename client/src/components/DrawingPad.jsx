@@ -1,6 +1,5 @@
 import React, {
   useState,
-  useRef,
   useEffect,
   forwardRef,
   useImperativeHandle,
@@ -8,21 +7,17 @@ import React, {
 import { SketchField } from "react-sketch";
 import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
-import { CompactPicker, CirclePicker } from "react-color";
+import { CirclePicker } from "react-color";
 import UndoIcon from "@material-ui/icons/Undo";
 import RedoIcon from "@material-ui/icons/Redo";
 import DeleteIcon from "@material-ui/icons/Delete";
 import SaveIcon from "@material-ui/icons/Save";
-import ClearIcon from "@material-ui/icons/Clear";
-import AddIcon from "@material-ui/icons/Add";
-import CopyIcon from "@material-ui/icons/FileCopy";
 import RemoveIcon from "@material-ui/icons/Remove";
 import DownloadIcon from "@material-ui/icons/CloudDownload";
 import Typography from "@material-ui/core/Typography/Typography";
 import { useSelector } from "react-redux";
 import {
   FormControl,
-  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -33,7 +28,6 @@ import RadioButtonUncheckedIcon from "@material-ui/icons/RadioButtonUnchecked";
 import CreateIcon from "@material-ui/icons/Create";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import Crop75Icon from "@material-ui/icons/Crop75";
-const fabric = require("fabric").fabric;
 
 const Tools = [
   {
@@ -102,7 +96,6 @@ const DrawingPad = forwardRef((props, ref) => {
     return state.room.room.find((v) => v.id === roomid);
   });
 
-  const refs = useRef(null);
   var _sketch = null;
   // props from parent
   const { initialValue } = props;

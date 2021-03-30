@@ -17,7 +17,7 @@ import { useHistory } from "react-router";
 import Backdrop from "@material-ui/core/Backdrop";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import LobbyInfoContainer from "../components/LobbyInfoContainer";
-import { getAllPlayers, GET_ALL_PLAYERS } from "../store/actions/player";
+import { getAllPlayers } from "../store/actions/player";
 import { Snackbar } from "@material-ui/core";
 // tables
 
@@ -42,13 +42,18 @@ const GameLobbyScreen = (props) => {
   const allPlayers = useSelector((state) => state.players.players);
   const dispatch = useDispatch();
   const history = useHistory();
-  useEffect(async () => {
-    setBackDrop(true);
-    const rooms = await new Promise((resolve) => {
-      socket.socket.on("allRooms", (rooms) => resolve(JSON.parse(rooms)));
-    });
-    setBackDrop(false);
-    dispatch(getAllRoom(rooms));
+  useEffect(() => {
+    const call = async () => {
+      setBackDrop(true);
+      const rooms = await new Promise((resolve) => {
+        socket.socket.on("allRooms", (rooms) => resolve(JSON.parse(rooms)));
+      });
+      setBackDrop(false);
+      dispatch(getAllRoom(rooms));
+    };
+
+    call();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -60,15 +65,19 @@ const GameLobbyScreen = (props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(async () => {
-    setLoadPlayers(true);
-    const player = await new Promise((resolve) => {
-      socket.socket.on("allPlayers", (player) => {
-        resolve(JSON.parse(player));
+  useEffect(() => {
+    const call = async () => {
+      setLoadPlayers(true);
+      const player = await new Promise((resolve) => {
+        socket.socket.on("allPlayers", (player) => {
+          resolve(JSON.parse(player));
+        });
       });
-    })
-    dispatch(getAllPlayers(player));
-    setLoadPlayers(false);
+      dispatch(getAllPlayers(player));
+      setLoadPlayers(false);
+    };
+
+    call();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -121,7 +130,6 @@ const GameLobbyScreen = (props) => {
             setCancel(true);
             setTimeout(() => setCancel(false), 800);
             result = await passwordModalRef.current.show();
-
           }
         } catch (err) {
           setSnackBarMessage("cancel");

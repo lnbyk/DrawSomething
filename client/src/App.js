@@ -3,7 +3,6 @@ import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import Socket from "./utils/socket";
 import HomeScreen from "./screens/HomeScreen";
 import GameLobbyScreen from "./screens/GameLobbyScreen";
-import RoomCreateModal from "./components/RoomCreateModal";
 import thunk from "redux-thunk";
 import { createStore, combineReducers, applyMiddleware } from "redux";
 import { Provider } from "react-redux";
@@ -22,6 +21,7 @@ import "firebase/analytics";
 import "firebase/auth";
 import "firebase/firestore";
 import playerReducer from "./store/reducers/player";
+import GameSummary from "./components/GameSummary";
 
 var mysocket = new Socket();
 mysocket.onConnect(111);
@@ -39,6 +39,7 @@ const App = () => {
       <div className="mainContainer">
         <BrowserRouter>
           <Switch>
+            <Route exact path="/test" component={GameSummary}/>
             <Route exact path="/">
               <Redirect to="/lobby" />
             </Route>

@@ -33,7 +33,6 @@ const Table = (props) => {
       <div
         id="lock"
         style={{
-          textAlign: "center",
           position: "absolute",
           top: 0,
           width: "100%",
